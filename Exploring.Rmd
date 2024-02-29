@@ -1,0 +1,73 @@
+---
+title: "Exploring"
+output: html_document
+date: "2024-02-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+```
+
+
+*Original dataframe from N-MHSS Codebook*
+```{r}
+nmhss_2019 <- read_csv(here("nmhss-puf-2019-csv.csv"))
+```
+
+
+*Omitted nonessential variables from original dataframe, created nmhss_2019_2*
+```{r}
+nmhss_2019_2 <- nmhss_2019[, !(names(nmhss_2019) %in% c('CASEID','LANGPROV','LANG16','LANG_B','LANG1','LANG2','LANG3','LANG21','LANG4','LANG5','LANG6','LANG7','LANG8','LANG24','LANG9','LANG10','LANG22','LANG25','LANG26','LANG11','LANG19','LANG23','LANG12','LANG13','LANG14','LANG15','LANG20','LANG17','LANG18','SMOKINGPOLICY'))]
+
+```
+
+
+*Created a new dataframe to include data from HI only*
+```{r}
+row_numbers_to_include <- 3100:3138
+nmhss_2019_HI <- nmhss_2019_2[row_numbers_to_include, ]
+
+```
+
+
+*Isolated for primary treatment focus on 'Mental health treatment' (value of 1) and 'Mix of mental health and substance use treatment' (value of 3) facilities - Question A8 in N-MHSS Survey*
+```{r}
+mhsu_facilities_2019_HI <- subset(nmhss_2019_HI, FOCUS != 4) 
+
+```
+
+
+
+
+
+*Separated data by ownership, as defined by the N-MHSS Codebook, these are "Organization that operates the facility". Parameters are: 1 - Private for-profit organization; 2 - Private non-profit organization; 3 - Public agency or department - Question A10 in N-MHSS Survey. Omitted 'PUBLICAGENCY' variable as this is a subset variable for Q.A10 (Q.A10a)*
+```{r}
+private_for_profit <- mhsu_facilities_2019_HI[mhsu_facilities_2019_HI$OWNERSHP == 1,!(names(mhsu_facilities_2019_HI) %in% c('PUBLICAGENCY', 'FOCUS','OWNERSHP')) ]
+
+```
+
+```{r}
+private_non_profit <- mhsu_facilities_2019_HI[mhsu_facilities_2019_HI$OWNERSHP == 2,!(names(mhsu_facilities_2019_HI) %in% c('PUBLICAGENCY','FOCUS','OWNERSHP')) ]
+
+```
+
+```{r}
+public_agency_dept <- mhsu_facilities_2019_HI[mhsu_facilities_2019_HI$OWNERSHP == 3,!(names(mhsu_facilities_2019_HI) %in% c('FOCUS','OWNERSHP','PUBLICAGENCY')) ]
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

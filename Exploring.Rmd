@@ -8,6 +8,7 @@ date: "2024-02-15"
 knitr::opts_chunk$set(echo = TRUE)
 library(here)
 library(tidyverse)
+library(plotly)
 ```
 
 
@@ -59,15 +60,149 @@ public_agency_dept <- mhsu_facilities_2019_HI[mhsu_facilities_2019_HI$OWNERSHP =
 ```
 
 
+*Facilities by organization* 
+```{r}
+ggplot(data=mhsu_facilities_2019_HI, aes(x=OWNERSHP))+
+  geom_bar(stat="count")
+```
+```{r}
+mhsu_facilities_2019_HI$OWNERSHP[mhsu_facilities_2019_HI$OWNERSHP == "1"] <- "Private, for profit organization"
+mhsu_facilities_2019_HI$OWNERSHP[mhsu_facilities_2019_HI$OWNERSHP == "2"] <- "Private, non profit organization"
+mhsu_facilities_2019_HI$OWNERSHP[mhsu_facilities_2019_HI$OWNERSHP == "3"] <- "Public agency organization"
+```
+
+
+
+```{r}
+mhsu_facilities_2019_HI$PUBLICAGENCY <- as.factor(mhsu_facilities_2019_HI$PUBLICAGENCY)
+```
 
 
 
 
+```{r}
+ggplot(data=mhsu_facilities_2019_HI, aes(x=OWNERSHP, fill=PUBLICAGENCY))+
+  geom_bar(stat="count")+
+  theme_minimal()+
+  labs(title= "Facilities by Organizations in Hawaii",
+       x="Ownership",
+       y="Number of facilities")
+```
+```{r}
+nmhss_2019_2$PUBLICAGENCY <- as.factor(nmhss_2019_2$PUBLICAGENCY)
+```
+
+
+```{r}
+facility_organization_plot <- ggplot(data=nmhss_2019_2, aes(x=OWNERSHP, fill=PUBLICAGENCY))+
+  geom_bar(stat="count")+
+  theme_minimal()+
+  labs(title= "Facilities by Organizations",
+       x="Ownership",
+       y="Number of facilities")
+ggplotly(facility_organization_plot)
+```
+
+
+```{r}
+ggplot(data=nmhss_2019_2, aes(x=OWNERSHP, fill=PUBLICAGENCY))+
+  geom_bar(stat="count")+
+  theme_minimal()+
+  labs(title= "Facilities by Organizations",
+       x="Ownership",
+       y="Number of facilities")+
+  facet_wrap(~LST)
+```
 
 
 
+*Facility Type by Ownership*
+
+```{r}
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "1"] <- "Psychiatric hospital"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "2"] <- "Separate inpatient psychiatric unit of a general hospital"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "3"] <- "Residential treatment center for children"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "4"] <- "Residential treatment center for adults"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "5"] <- "Other type of residential treatment facility"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "6"] <- "Veterans Administration Medical Center"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "7"] <- "Community Mental Health Center"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "8"] <- "Certified Community Behavioral Health Clinic"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "9"] <- "Partial hospitalization/day treatment facility"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "10"] <- "Outpatient mental health facility"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "11"] <- "Multi-setting mental health facility"
+mhsu_facilities_2019_HI$FACILITYTYPE[mhsu_facilities_2019_HI$FACILITYTYPE == "12"] <- "Other"
+```
+
+```{r}
+mhsu_facilities_2019_HI$FACILITYTYPE <- as.factor(mhsu_facilities_2019_HI$FACILITYTYPE)
+```
+
+```{r}
+ggplot(data=mhsu_facilities_2019_HI, aes(x=OWNERSHP, fill=FACILITYTYPE))+
+  geom_bar(stat="count")+
+  theme_minimal()+
+  labs(title= "Facility Type by Ownership",
+       x="Ownership",
+       y="Number of facilities")
+```
+
+
+```{r}
+nmhss_2019_2$FACILITYTYPE <- as.factor(nmhss_2019_2$FACILITYTYPE)
+```
+
+```{r}
+facility_organization_plot <- ggplot(data=nmhss_2019_2, aes(x=OWNERSHP, fill=FACILITYTYPE))+
+  geom_bar(stat="count")+
+  theme_minimal()+
+  labs(title= "Facility Type by Ownership",
+       x="Ownership",
+       y="Number of facilities")
+ggplotly(facility_organization_plot)
+```
+
+
+```{r}
+facilitytype_by_ownership <- ggplot(data=nmhss_2019_2, aes(x=OWNERSHP, fill=FACILITYTYPE))+
+  geom_bar(stat="count")+
+  theme_minimal()+
+  labs(title= "Facility Type by Ownership",
+       x="Ownership",
+       y="Number of facilities")+
+  facet_wrap(~LST)
+ggplotly(facilitytype_by_ownership)
+```
+
+*Adding population data for each state*
+
+
+```{r}
+us_state_population_2019 <- read_csv(here("us-states-territories.csv"))
+
+```
+*Joining population data with nmhss data*
+
+
+```{r}
+colnames(nmhss_2019_2)[colnames(nmhss_2019_2) == "LST"] ="Abbreviation"
+```
+
+```{r}
+nmhss_pop <- full_join(nmhss_2019_2, us_state_population_2019, by="Abbreviation")
+```
 
 
 
+*number of facilities by state/population*
 
+
+```{r}
+facility_per_state_population <- ggplot(data=nmhss_pop, aes(x=OWNERSHP, fill=))+
+  geom_bar(stat="count")+
+  theme_minimal()+
+  labs(title= "Facility Type per State Population",
+       x="Ownership",
+       y="Number of facilities")
+ggplotly(facility_per_state_population)
+```
 

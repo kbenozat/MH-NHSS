@@ -9,6 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(here)
 library(tidyverse)
 library(plotly)
+library(urbnmapr)
+options(scipen = 99)
 ```
 
 
@@ -191,9 +193,71 @@ colnames(nmhss_2019_2)[colnames(nmhss_2019_2) == "LST"] ="Abbreviation"
 nmhss_pop <- full_join(nmhss_2019_2, us_state_population_2019, by="Abbreviation")
 ```
 
+```{r}
+colnames(nmhss_pop)[colnames(nmhss_pop) == "Population (2019)"] ="pop_2019"
+```
+
 
 
 *number of facilities by state/population*
+
+
+
+
+```{r}
+nmhss_pop_counts <- nmhss_pop %>% 
+  group_by(Abbreviation, pop_2019) %>% 
+  count()
+```
+
+
+
+```{r}
+pop_facility_counts <- ggplot(nmhss_pop_counts, aes(x = n, pop_2019, label = Abbreviation)) +
+  geom_point() +
+  theme_minimal()
+
+ggplotly(pop_facility_counts)
+  
+  
+```
+
+```{r}
+nmhss_pop_counts_per_capita <- nmhss_pop_counts %>% 
+  group_by(Abbreviation, pop_2019) %>% 
+  summarise(per_capita = n/pop_2019)
+```
+
+
+```{r}
+ggplot(nmhss_pop_counts_per_capita, aes(y = reorder(Abbreviation, per_capita),
+                                        x = per_capita)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "facilities per capita",
+       y = "") +
+  theme_minimal()
+```
+
+
+
+Challenge 
+
+
+
+Can you use urbnmapr to make a map this information?
+
+
+```{r}
+map_data <- get_urbn_map(map = "states", sf = TRUE)
+```
+
+change the column name state_abbv in map_data to Abbreviation like the way it is in nmhss_pop_counts_per_capita
+
+
+then you should be able to join the data based on the shared column name (Abbreviation)
+
+then you should be able to plot!
+
 
 
 ```{r}

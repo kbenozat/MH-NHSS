@@ -13,6 +13,11 @@ library(urbnmapr)
 options(scipen = 99)
 ```
 
+```{r}
+install.packages("devtools")
+devtools::install_github("UrbanInstitute/urbnmapr")
+```
+
 
 *Original dataframe from N-MHSS Codebook*
 ```{r}
@@ -253,20 +258,30 @@ map_data <- get_urbn_map(map = "states", sf = TRUE)
 
 change the column name state_abbv in map_data to Abbreviation like the way it is in nmhss_pop_counts_per_capita
 
+```{r}
+colnames(map_data)[colnames(map_data) == "state_abbv"] ="Abbreviation"
+```
+
 
 then you should be able to join the data based on the shared column name (Abbreviation)
 
+```{r}
+nmhss_map <- full_join(map_data, nmhss_pop_counts_per_capita, by="Abbreviation")
+```
+
+
 then you should be able to plot!
 
-
-
 ```{r}
-facility_per_state_population <- ggplot(data=nmhss_pop, aes(x=OWNERSHP, fill=))+
-  geom_bar(stat="count")+
-  theme_minimal()+
-  labs(title= "Facility Type per State Population",
-       x="Ownership",
-       y="Number of facilities")
-ggplotly(facility_per_state_population)
+
+ggplot() +
+  geom_sf(nmhss_map,
+          mapping = aes(fill = per_capita),
+          color = "white", size = 0.25) +
+  labs(fill = "Facilities per Capita")
 ```
+
+
+
+`
 

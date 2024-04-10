@@ -278,7 +278,9 @@ ggplot() +
   geom_sf(nmhss_map,
           mapping = aes(fill = per_capita),
           color = "white", size = 0.25) +
-  labs(fill = "Facilities per Capita")
+  labs(fill = "Facilities per Capita") + 
+  scale_fill_viridis_c(option="magma") + 
+  theme_minimal()
 ```
 
 

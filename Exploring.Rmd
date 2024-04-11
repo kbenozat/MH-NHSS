@@ -10,12 +10,14 @@ library(here)
 library(tidyverse)
 library(plotly)
 library(urbnmapr)
+library(ggiraph)
+#library(ggiraphExtra)
 options(scipen = 99)
 ```
 
 ```{r}
-install.packages("devtools")
-devtools::install_github("UrbanInstitute/urbnmapr")
+# install.packages("devtools")
+# devtools::install_github("UrbanInstitute/urbnmapr")
 ```
 
 
@@ -234,6 +236,7 @@ nmhss_pop_counts_per_capita <- nmhss_pop_counts %>%
 ```
 
 
+
 ```{r}
 ggplot(nmhss_pop_counts_per_capita, aes(y = reorder(Abbreviation, per_capita),
                                         x = per_capita)) +
@@ -276,7 +279,7 @@ then you should be able to plot!
 
 ggplot() +
   geom_sf(nmhss_map,
-          mapping = aes(fill = per_capita),
+          mapping = aes(fill = per_capita, label = per_capita),
           color = "white", size = 0.25) +
   labs(fill = "Facilities per Capita") + 
   scale_fill_viridis_c(option="magma") + 
@@ -284,6 +287,24 @@ ggplot() +
 ```
 
 
+```{r}
+gg <- ggplot() +
+  geom_sf_interactive(nmhss_map,
+                      mapping = aes(fill = per_capita, tooltip = paste("State:", state_name, "<br>Per Capita:", per_capita)),
+                      color = "white", size = 0.25) +
+  labs(fill = "Facilities per Capita") + 
+  scale_fill_viridis_c(option="magma") + 
+  theme_minimal()
 
-`
+ggiraph(code = print(gg))
+```
+
+
+Can we calculate the facilities per 100,000 people with this code? Then add to the map:
+
+
+nmhss_pop_counts_per_capita <- nmhss_pop_counts_per_capita %>%
+  mutate(rate_per_100000 = (n / pop_2019) * 100000)
+  
+  
 

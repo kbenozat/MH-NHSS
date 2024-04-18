@@ -218,6 +218,14 @@ nmhss_pop_counts <- nmhss_pop %>%
 ```
 
 
+Calculate per 100,000
+
+```{r}
+nmhss_pop_counts_per_hundred_thousand <- nmhss_pop_counts %>% 
+  mutate(per_hundred_thousand = (n/pop_2019) * 100000)
+```
+
+
 
 ```{r}
 pop_facility_counts <- ggplot(nmhss_pop_counts, aes(x = n, pop_2019, label = Abbreviation)) +
@@ -272,6 +280,12 @@ then you should be able to join the data based on the shared column name (Abbrev
 nmhss_map <- full_join(map_data, nmhss_pop_counts_per_capita, by="Abbreviation")
 ```
 
+join per 100,000 data
+
+```{r}
+nmhss_map_per_hundred_thousand <- full_join(map_data, nmhss_pop_counts_per_hundred_thousand, by="Abbreviation")
+```
+
 
 then you should be able to plot!
 
@@ -287,6 +301,21 @@ ggplot() +
 ```
 
 
+per 100,000
+
+```{r}
+ggplot() +
+  geom_sf(nmhss_map_per_hundred_thousand,
+          mapping = aes(fill = per_hundred_thousand, label = per_hundred_thousand),
+          color = "white", size = 0.25) +
+  labs(fill = "Facilities per 100,00 People") + 
+  scale_fill_viridis_c(option="magma") + 
+  theme_minimal()
+```
+
+
+
+
 ```{r}
 gg <- ggplot() +
   geom_sf_interactive(nmhss_map,
@@ -298,6 +327,20 @@ gg <- ggplot() +
 
 ggiraph(code = print(gg))
 ```
+
+```{r}
+gg_per_hundred_thousand <- ggplot() +
+  geom_sf_interactive(nmhss_map_per_hundred_thousand,
+                      mapping = aes(fill = per_hundred_thousand, tooltip = paste("State:", state_name, "<br>Per Capita:", per_hundred_thousand)),
+                      color = "white", size = 0.25) +
+  labs(fill = "Facilities per 100,000 People") + 
+  scale_fill_viridis_c(option="magma") + 
+  theme_minimal()
+
+ggiraph(code = print(gg_per_hundred_thousand))
+```
+
+
 
 
 Can we calculate the facilities per 100,000 people with this code? Then add to the map:

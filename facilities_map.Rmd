@@ -1,0 +1,62 @@
+---
+title: "Services Map"
+author: "Connor Flynn"
+date: "4/24/2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(here)
+library(tidygeocoder)
+library(mapview)
+```
+
+Read in Data
+
+```{r}
+#facilities <- read_excel(here("National_Directory_MH_Facilities_2022.xlsx"))
+```
+
+
+Merge Columns
+
+```{r}
+# facilities <- facilities %>%
+#   unite(whole_adress, c("street1", "city", "state", "zip"), sep = " ")
+```
+
+Geocode facilities (Takes 2.5 hours to run)
+
+```{r}
+# facilities <- facilities %>%
+#   geocode(whole_adress, method = 'osm', lat = latitude , long = longitude)
+```
+
+Save geocoded facilities file
+
+```{r}
+#write_csv(facilities, here("geocoded_facilities.csv"))
+```
+
+Read in geocoded facilities file
+
+```{r}
+geocoded_facilities <- read_csv(here("geocoded_facilities.csv"))
+```
+```{r}
+geocoded_facilities_filtered <- geocoded_facilities %>% 
+  drop_na(longitude, latitude)
+```
+
+
+```{r}
+mapview(geocoded_facilities_filtered, xcol = "longitude", ycol = "latitude", crs = 4269, grid = FALSE, cex = 5)
+```
+
+```{r}
+b <- breweries
+```
+

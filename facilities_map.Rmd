@@ -53,7 +53,7 @@ geocoded_facilities_filtered <- geocoded_facilities %>%
 
 
 ```{r}
-mapview(geocoded_facilities_filtered, xcol = "longitude", ycol = "latitude", crs = 4269, grid = FALSE, cex = 5)
+mapview(geocoded_facilities_filtered, xcol = "longitude", ycol = "latitude", popup = "name1", crs = 4269, grid = FALSE, cex = 5)
 ```
 
 ```{r}
